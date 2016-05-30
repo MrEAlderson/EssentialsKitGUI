@@ -1,3 +1,12 @@
+/**
+* Adds an GUI for the essentials command /kit
+* https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
+*
+* @author  Marcely1199
+* @version 1.3
+* @website http://marcely.de/ 
+*/
+
 package de.marcely.kitgui.command;
 
 import org.bukkit.ChatColor;
@@ -7,10 +16,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import de.marcely.kitgui.Kit;
-import de.marcely.kitgui.language;
+import de.marcely.kitgui.Language;
 import de.marcely.kitgui.main;
 import de.marcely.kitgui.config.KitConfig;
-import de.marcely.kitgui.config.config;
+import de.marcely.kitgui.config.Config;
 
 public class kitcfg implements CommandExecutor {
 
@@ -32,20 +41,23 @@ public class kitcfg implements CommandExecutor {
 						if(main.getKit(kitname.toLowerCase()) != null){
 							if(icon != null){
 								setIcon(kitname, icon, id);
-								sender.sendMessage(ChatColor.GREEN + language.iconChangedTo + " " + ChatColor.DARK_GREEN + icon.name().toLowerCase().replace("_", " ") + ChatColor.GREEN + "!");
+								sender.sendMessage(Language.Changed_Icon.getMessage().replace("{icon}", icon.name().toLowerCase().replace("_", " ")));
 							}else{
-								sender.sendMessage(ChatColor.DARK_RED + language.unkownMaterial + " " + ChatColor.RED + args[2] + ChatColor.DARK_RED + "!");
+								sender.sendMessage(Language.Unkown_Material.getMessage().replace("{material}", args[2]));
 							}
 						}else{
-							sender.sendMessage(ChatColor.DARK_RED + language.theKit + " " + ChatColor.RED + kitname + ChatColor.DARK_RED + " " + language.doesntExists);
+							sender.sendMessage(Language.DoesntExist_Kit.getMessage().replace("{kit}", kitname));
 						}
 					}else{
-						sender.sendMessage(ChatColor.YELLOW + language.howToUseThisCommand + ": " + ChatColor.GOLD + "/kitcfg seticon <kit name> <material>");
+						sender.sendMessage(Language.Usage.getMessage().replace("{usage}", "/kitcfg seticon <kit name> <material>"));
 					}
 				}else if(subcommand.equalsIgnoreCase("prefix")){
+					
 					if(args.length >= 2){
-						if(main.getKit(args[1].toLowerCase()) != null){
-							Kit kit = main.kits.getKit(args[1]);
+						
+						Kit kit = main.kits.getKit(args[1]);
+						
+						if(kit != null){
 							String kitname = main.getKit(args[1].toLowerCase()).getName();
 							String bPrefix = null;
 							
@@ -53,52 +65,105 @@ public class kitcfg implements CommandExecutor {
 								bPrefix = kit.getPrefix();
 							
 							if(args.length >= 4 && args[2].equalsIgnoreCase("set")){
-								String aPrefix = args[3];
-								main.kits.setPrefix(kitname, aPrefix);
+								
+								main.kits.setPrefix(kitname, args[3]);
 								KitConfig.save(main.kits);
-								sender.sendMessage(ChatColor.GREEN + language.thePrefixByTheKit + " " + ChatColor.DARK_GREEN + kitname + ChatColor.GREEN + " " + language.hasBeenSuccessfullyChanged);
+								sender.sendMessage(Language.Changed_Prefix.getMessage().replace("{kit}", kitname));
+								
+							}else if(args.length >= 3 && args[2].equalsIgnoreCase("remove")){
+								
+								main.kits.setPrefix(kitname, "");
+								KitConfig.save(main.kits);
+								sender.sendMessage(Language.Changed_Prefix.getMessage().replace("{kit}", kitname));
+							
 							}else{
 								for(int i=0; i<7; i++)
 									sender.sendMessage("");
 								if(bPrefix != null)
 									sender.sendMessage(ChatColor.GRAY + "Prefix: " + ChatColor.WHITE + bPrefix + kitname);
 								else
-									sender.sendMessage(ChatColor.RED + kitname + " " + ChatColor.DARK_RED + language.gotNoPrefix);
+									sender.sendMessage(Language.No_Prefix.getMessage().replace("{kit}", kitname));
 								sender.sendMessage("");
-								sender.sendMessage(ChatColor.GOLD + language.write + ChatColor.YELLOW + "/kitcfg prefix <kit name> set <prefix> " + ChatColor.GOLD + language.toChangeThePrefix);
+								sender.sendMessage(Language.Usage_Change_Prefix.getMessage().replace("{usage}", "/" + label + " prefix <kit name> set <prefix>"));
+								sender.sendMessage(Language.Usage_Remove_Prefix.getMessage().replace("{usage}", "/" + label + " prefix <kit name> remove"));
 							}
-						}else{
-							sender.sendMessage(ChatColor.DARK_RED + language.theKit + " " + ChatColor.RED + args[1] + ChatColor.DARK_RED + " " + language.doesntExists);
-						}
+						}else
+							sender.sendMessage(Language.DoesntExist_Kit.getMessage().replace("{kit}", args[1]));
 					}else{
-						sender.sendMessage(ChatColor.YELLOW + language.howToUseThisCommand + ": " + ChatColor.GOLD + "/kitcfg prefix <kit name>");
+						sender.sendMessage(Language.Usage.getMessage().replace("{usage}", "/" + label + " prefix <kit name>"));
 					}
 				}else if(subcommand.equalsIgnoreCase("lore")){
+
 					if(args.length >= 2){
-						if(main.getKit(args[1].toLowerCase()) != null){
+						
+						Kit kit = main.kits.getKit(args[1]);
+						
+						if(kit != null){
+							
+							// check if under 1.2
+							try{
+								kit.getLores();
+							}catch(Exception e){
+								sender.sendMessage(ChatColor.RED + "A error occured: Remove the file at " + ChatColor.DARK_RED + "plugins/" + main.plugin.getName() + "/kits.cfg" + '\n' + ChatColor.RED + "And reload this plugin");
+								return true;
+							}
+							
+							
+							// add lore
 							if(args.length >= 4 && args[2].equalsIgnoreCase("add")){
 								
+								kit.addLore(args[3]);
+								KitConfig.save(main.kits);
+								sender.sendMessage(Language.Added_Lore.getMessage().replace("{kit}", kit.getName()));
+								
+							// remove lore
 							}else if(args.length >= 4 && args[2].equalsIgnoreCase("remove")){
 								
-							}else{
+								if(main.isInteger(args[3])){
+									
+									int id = Integer.valueOf(args[3]);
+									
+									if(id >= 0 && id < kit.getLores().size()){
+										
+										kit.removeLore(kit.getLores().get(id));
+										KitConfig.save(main.kits);
+										sender.sendMessage(Language.Removed_Lore.getMessage().replace("{id}", args[3]).replace("{kit}", kit.getName()));
+										
+									}else
+										sender.sendMessage(Language.Unkown_ID.getMessage().replace("{id}", args[3]));
+									
+								}else
+									sender.sendMessage(Language.NotA_Number.getMessage().replace("{number}", args[3]));
 								
+							// informations
+							}else{
+								sender.sendMessage(ChatColor.DARK_AQUA + "Lores:");
+								
+								int i=0;
+								for(String lore:kit.getLores()){
+									sender.sendMessage("" + ChatColor.DARK_GREEN + i + ChatColor.GREEN + " " + lore);
+									i++;
+								}
+								
+								sender.sendMessage("");
+								sender.sendMessage(Language.Usage_Add_Lore.getMessage().replace("{usage}", "/" + label + " lore <kit name> add <lore>"));
+								sender.sendMessage(Language.Usage_Remove_Lore.getMessage().replace("{usage}", "/" + label + " lore <kit name> remove <id>"));
 							}
-						}else{
-							sender.sendMessage(ChatColor.DARK_RED + language.theKit + " " + ChatColor.RED + args[1] + ChatColor.DARK_RED + " " + language.doesntExists);
-						}
-					}else{
-						sender.sendMessage(ChatColor.YELLOW + language.howToUseThisCommand + ": " + ChatColor.GOLD + "/kitcfg lore <kit name>");
-					}
+						}else
+							sender.sendMessage(Language.DoesntExist_Kit.getMessage().replace("{kit}", args[1]));
+						
+					}else
+						sender.sendMessage(Language.Usage.getMessage().replace("{usage}", "/" + label + " lore <kit name>"));
 				}else if(subcommand.equalsIgnoreCase("reload")){
-					config.load();
-					sender.sendMessage(ChatColor.GREEN + language.reloadedConfig);
+					Config.load();
+					sender.sendMessage(Language.Reloaded_Config.getMessage());
 				}else{
-					sender.sendMessage(ChatColor.DARK_RED + language.unkownSubcommand + " " + ChatColor.RED + subcommand + ChatColor.DARK_RED + "!");
+					sender.sendMessage(Language.Unkown_Argument.getMessage().replace("{arg}", subcommand));
 				}
 			}else
 				sendCommands(sender);
 		}else{
-			sender.sendMessage(ChatColor.DARK_RED + language.noPermissions);
+			sender.sendMessage(Language.No_Permissions.getMessage());
 		}
 		return true;
 	}
@@ -106,14 +171,14 @@ public class kitcfg implements CommandExecutor {
 	public void sendCommands(CommandSender sender){
 		sender.sendMessage("");
 		sender.sendMessage(ChatColor.YELLOW + " ------------ " + ChatColor.GOLD + "Commands" + ChatColor.YELLOW + " ------------ ");
-		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg help " + ChatColor.AQUA + language.saysYouTheCommandForKitcfg);
-		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg seticon <kitName> <material> " + ChatColor.AQUA + language.changeTheIconFromAKit);
-		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg prefix <kitName> " + ChatColor.AQUA + language.changeThePrefixFromAKit);
-		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg lore <kitname> " + ChatColor.AQUA + language.addOrRemoveLoresFromAKit);
-		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg reload " + ChatColor.AQUA + language.reloadTheConfig);
+		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg help");
+		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg seticon <kitName> <material>");
+		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg prefix <kitName>");
+		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg lore <kitname>");
+		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg reload");
 		sender.sendMessage("");
-		sender.sendMessage(ChatColor.GREEN + "KitGUI " + language.ressourceBy + " " + ChatColor.DARK_GREEN + "Marcely1199");
-		sender.sendMessage(ChatColor.GREEN + "KitGUI " + language.version + " " + ChatColor.DARK_GREEN + main.version);
+		sender.sendMessage(Language.Info_MadeBy.getMessage().replace("{info}", "Marcely1199"));
+		sender.sendMessage(Language.Info_Version.getMessage().replace("{info}", "" + main.getVersion()));
 	}
 	
 	public void setIcon(String kitname, Material icon, int id){
