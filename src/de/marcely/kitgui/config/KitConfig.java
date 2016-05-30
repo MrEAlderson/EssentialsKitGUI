@@ -1,3 +1,12 @@
+/**
+* Adds an GUI for the essentials command /kit
+* https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
+*
+* @author  Marcely1199
+* @version 1.3
+* @website http://marcely.de/ 
+*/
+
 package de.marcely.kitgui.config;
 
 import java.io.File;
@@ -14,16 +23,13 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import de.marcely.kitgui.Kit;
+import de.marcely.kitgui.main;
 
 public class KitConfig implements Serializable {
 	private static final long serialVersionUID = -1266449831520034396L;
 	private ArrayList<Kit> kits = new ArrayList<Kit>();
 	
 	public KitConfig(){ }
-	
-	public int addLore(String kitname, String lore){
-		return getKit(kitname).addLore(lore);
-	}
 	
 	public void setIcon(String kitname, Material icon, int id){
 		if(contains(kitname)){
@@ -44,10 +50,21 @@ public class KitConfig implements Serializable {
 	}
 	
 	public Kit getKit(String name){
+		
 		for(Kit kit:kits){
 			if(kit.getName().equalsIgnoreCase(name))
 				return kit;
 		}
+		
+		// create new if it doesn't exists
+		com.earth2me.essentials.Kit eKit = main.getKit(name);
+		if(eKit != null){
+			Kit kit = new Kit(eKit.getName(), new ItemStack(Material.CLAY_BALL, 1));
+			kits.add(kit);
+			save(this);
+			return kit;
+		}
+		
 		return null;
 	}
 	
@@ -57,14 +74,6 @@ public class KitConfig implements Serializable {
 	
 	public String getPrefix(String kitname){
 		return getKit(kitname).getPrefix();
-	}
-	
-	public String getLore(String kitname, int line){
-		return getKit(kitname).getLore(line);
-	}
-	
-	public boolean removeLore(String kitname, int line){
-		return getKit(kitname).removeLore(line);
 	}
 	
 	public boolean contains(String kitname){
