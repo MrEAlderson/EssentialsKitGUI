@@ -3,7 +3,7 @@
 * https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
 *
 * @author  Marcely1199
-* @version 1.3
+* @version 1.3.1
 * @website http://marcely.de/ 
 */
 
@@ -25,7 +25,7 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 
-import de.marcely.kitgui.main;
+import de.marcely.kitgui.Util;
 
 public class ConfigManager {
 	private File configFile = null;
@@ -99,7 +99,7 @@ public class ConfigManager {
 	
 	public int getConfigInt(String name){
 		Object obj = getConfigObj(name);
-		if(obj instanceof String && main.isInteger(String.valueOf(obj)))
+		if(obj instanceof String && Util.isInteger(String.valueOf(obj)))
 			return Integer.valueOf(String.valueOf(obj));
 		
 		return Integer.MAX_VALUE;
