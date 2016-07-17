@@ -3,7 +3,7 @@
 * https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
 *
 * @author  Marcely1199
-* @version 1.3
+* @version 1.3.1
 * @website http://marcely.de/ 
 */
 
@@ -23,7 +23,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import de.marcely.kitgui.Kit;
-import de.marcely.kitgui.main;
+import de.marcely.kitgui.Util;
 
 public class KitConfig implements Serializable {
 	private static final long serialVersionUID = -1266449831520034396L;
@@ -57,7 +57,7 @@ public class KitConfig implements Serializable {
 		}
 		
 		// create new if it doesn't exists
-		com.earth2me.essentials.Kit eKit = main.getKit(name);
+		com.earth2me.essentials.Kit eKit = Util.getKit(name);
 		if(eKit != null){
 			Kit kit = new Kit(eKit.getName(), new ItemStack(Material.CLAY_BALL, 1));
 			kits.add(kit);
