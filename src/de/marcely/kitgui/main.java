@@ -3,19 +3,16 @@
 * https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
 *
 * @author  Marcely1199
-* @version 1.3
+* @version 1.3.1
 * @website http://marcely.de/ 
 */
 
 package de.marcely.kitgui;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -92,65 +89,7 @@ public class main extends JavaPlugin {
 		}
 	};
 	
-	public static ArrayList<Kit> getKits(Player player){
-		ArrayList<Kit> list = new ArrayList<Kit>();
-		for(String kitName:es.getSettings().getKits().getKeys(false)){
-			
-			Kit kit = kits.getKit(kitName);
-			list.add(kit);
-			
-		}
-		return list;
-	}
-	
-	public static com.earth2me.essentials.Kit getKit(String kitname){
-		ConfigurationSection kits = es.getSettings().getKits();
-		for (String kitItem:kits.getKeys(false)){
-			try {
-				com.earth2me.essentials.Kit kit = new com.earth2me.essentials.Kit(kitItem, es);
-				if(kit.getName().equalsIgnoreCase(kitname)){
-					return kit;
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
-	}
-	
-	public static boolean givePlayerItems(Player player, String kitname){
-		ConfigurationSection kits = es.getSettings().getKits();
-		for (String kitItem:kits.getKeys(false)){
-			try {
-				com.earth2me.essentials.Kit kit = new com.earth2me.essentials.Kit(kitItem, es);
-				if(kit.getName().equals(kitname)){
-					kit.expandItems(es.getUser(player));
-					return true;
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return false;
-	}
-	
-	public static String firstCharCaps(String str){
-		if(CONFIG_FIRSTCHARCAPS == true)
-			return Character.toUpperCase(str.charAt(0)) + str.substring(1);
-		return str;
-	}
-	
-	public static boolean isInteger(String str){
-		try{
-			Integer.valueOf(str);
-			return true;
-		}catch(Exception e){
-			return false;
-		}
-	}
-	
 	public static String getVersion(){
-		return plugin.getDescription().getVersion();
+		return main.plugin.getDescription().getVersion();
 	}
 }
