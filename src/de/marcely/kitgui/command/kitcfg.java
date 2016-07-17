@@ -17,6 +17,7 @@ import org.bukkit.command.CommandSender;
 
 import de.marcely.kitgui.Kit;
 import de.marcely.kitgui.Language;
+import de.marcely.kitgui.Util;
 import de.marcely.kitgui.main;
 import de.marcely.kitgui.config.KitConfig;
 import de.marcely.kitgui.config.Config;
@@ -25,7 +26,7 @@ public class kitcfg implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if(sender.hasPermission("kitgui.cfg")){
+		if(Util.hasPermission(sender, "kitgui.cfg")){
 			if(args.length >= 1){
 				String subcommand = args[0];
 				if(subcommand.equalsIgnoreCase("help")){
@@ -38,7 +39,7 @@ public class kitcfg implements CommandExecutor {
 						int id = 0;
 						if(splits.length >= 2 && isNumber(splits[1]))
 							id = Integer.valueOf(splits[1]);
-						if(main.getKit(kitname.toLowerCase()) != null){
+						if(Util.getKit(kitname.toLowerCase()) != null){
 							if(icon != null){
 								setIcon(kitname, icon, id);
 								sender.sendMessage(Language.Changed_Icon.getMessage().replace("{icon}", icon.name().toLowerCase().replace("_", " ")));
@@ -58,7 +59,7 @@ public class kitcfg implements CommandExecutor {
 						Kit kit = main.kits.getKit(args[1]);
 						
 						if(kit != null){
-							String kitname = main.getKit(args[1].toLowerCase()).getName();
+							String kitname = Util.getKit(args[1].toLowerCase()).getName();
 							String bPrefix = null;
 							
 							if(kit != null && kit.getPrefix() != null)
@@ -119,7 +120,7 @@ public class kitcfg implements CommandExecutor {
 							// remove lore
 							}else if(args.length >= 4 && args[2].equalsIgnoreCase("remove")){
 								
-								if(main.isInteger(args[3])){
+								if(Util.isInteger(args[3])){
 									
 									int id = Integer.valueOf(args[3]);
 									

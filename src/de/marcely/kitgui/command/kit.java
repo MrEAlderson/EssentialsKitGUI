@@ -29,6 +29,7 @@ import com.earth2me.essentials.User;
 
 import de.marcely.kitgui.Kit;
 import de.marcely.kitgui.Language;
+import de.marcely.kitgui.Util;
 import de.marcely.kitgui.main;
 
 public class kit implements CommandExecutor {
@@ -44,16 +45,16 @@ public class kit implements CommandExecutor {
 		if(sender instanceof Player){
 			Player player = (Player) sender;
 			if(args.length == 0){
-				if(player.hasPermission("essentials.kit")){
+				if(Util.hasPermission(player, "essentials.kit")){
 					player.openInventory(getKitInventory(player));
 				}else{
 					sender.sendMessage(Language.No_Permissions.getMessage());
 				}
 			}else{
 				String kitname = args[0];
-				com.earth2me.essentials.Kit kit = main.getKit(kitname.toLowerCase());
+				com.earth2me.essentials.Kit kit = Util.getKit(kitname.toLowerCase());
 				if(kit != null){
-					if(sender.hasPermission("essentials.kits." + kitname.toLowerCase()))
+					if(Util.hasPermission(sender, "essentials.kits." + kitname.toLowerCase()) || Util.hasPermission(sender, "essentials.kits.*"))
 						giveKit(player, kit);
 					else
 						sender.sendMessage(Language.No_Permissions.getMessage());
@@ -75,7 +76,7 @@ public class kit implements CommandExecutor {
 			event.setCancelled(true);
 			player.closeInventory();
 			
-			com.earth2me.essentials.Kit kit = main.getKit(getKitAt(player, event.getSlot(), 1).getName());
+			com.earth2me.essentials.Kit kit = Util.getKit(getKitAt(player, event.getSlot(), 1).getName());
 			
 			giveKit(player, kit);
 		}
@@ -93,7 +94,7 @@ public class kit implements CommandExecutor {
 		// check, if he is allowed to
 		try { kit.checkDelay(user); } catch (Exception e) { return; }
 		
-		player.sendMessage(Language.Giving.getMessage().replace("{kit}", main.firstCharCaps(kit.getName())));
+		player.sendMessage(Language.Giving.getMessage().replace("{kit}", Util.firstCharCaps(kit.getName())));
 		
 		// give items
 		try { kit.expandItems(user); } catch (Exception e) { }
@@ -103,14 +104,14 @@ public class kit implements CommandExecutor {
 	}
 	
 	public static Inventory getKitInventory(Player player){
-		ArrayList<Kit> kits = main.getKits(player);
+		ArrayList<Kit> kits = Util.getKits(player);
 		Inventory inv = Bukkit.createInventory(player, getInvSize(kits.size()), main.CONFIG_INVTITLE);
 		for(Kit kit:kits){
 			ItemStack is = kit.getIcon();
 			ItemMeta im = is.getItemMeta();
 			
 			// name
-			im.setDisplayName(ChatColor.WHITE + Language.stringToChatColor(kit.getPrefix()) + main.firstCharCaps(kit.getName()));
+			im.setDisplayName(ChatColor.WHITE + Language.stringToChatColor(kit.getPrefix()) + Util.firstCharCaps(kit.getName()));
 			
 			// lores
 			List<String> lores = new ArrayList<String>();
@@ -134,7 +135,7 @@ public class kit implements CommandExecutor {
 	}
 	
 	public static Kit getKitAt(Player player, int at, int page){
-		List<Kit> kits = main.getKits(player);
+		List<Kit> kits = Util.getKits(player);
 		
 		if(at > MAXPERPAGE)
 			return null;
