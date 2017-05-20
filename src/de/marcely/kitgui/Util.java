@@ -3,7 +3,7 @@
 * https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
 *
 * @author  Marcely1199
-* @version 1.3.1
+* @version 1.4
 * @website http://marcely.de/ 
 */
 
@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import de.marcely.kitgui.library.Vault;
 
@@ -21,10 +23,10 @@ public class Util {
 	
 	public static ArrayList<Kit> getKits(Player player){
 		ArrayList<Kit> list = new ArrayList<Kit>();
-		for(String kitName:main.es.getSettings().getKits().getKeys(false)){
+		for(String kitName:EssentialsKitGUI.es.getSettings().getKits().getKeys(false)){
 			
 			if(hasPermission(player, "essentials.kits." + kitName) || hasPermission(player, "essentials.kits.*")){
-				Kit kit = main.kits.getKit(kitName);
+				Kit kit = EssentialsKitGUI.kits.getKit(kitName);
 				list.add(kit);
 			}
 			
@@ -33,10 +35,10 @@ public class Util {
 	}
 	
 	public static com.earth2me.essentials.Kit getKit(String kitname){
-		ConfigurationSection kits = main.es.getSettings().getKits();
+		ConfigurationSection kits = EssentialsKitGUI.es.getSettings().getKits();
 		for (String kitItem:kits.getKeys(false)){
 			try {
-				com.earth2me.essentials.Kit kit = new com.earth2me.essentials.Kit(kitItem, main.es);
+				com.earth2me.essentials.Kit kit = new com.earth2me.essentials.Kit(kitItem, EssentialsKitGUI.es);
 				if(kit.getName().equalsIgnoreCase(kitname)){
 					return kit;
 				}
@@ -48,12 +50,12 @@ public class Util {
 	}
 	
 	public static boolean givePlayerItems(Player player, String kitname){
-		ConfigurationSection kits = main.es.getSettings().getKits();
+		ConfigurationSection kits = EssentialsKitGUI.es.getSettings().getKits();
 		for (String kitItem:kits.getKeys(false)){
 			try {
-				com.earth2me.essentials.Kit kit = new com.earth2me.essentials.Kit(kitItem, main.es);
+				com.earth2me.essentials.Kit kit = new com.earth2me.essentials.Kit(kitItem, EssentialsKitGUI.es);
 				if(kit.getName().equals(kitname)){
-					kit.expandItems(main.es.getUser(player));
+					kit.expandItems(EssentialsKitGUI.es.getUser(player));
 					return true;
 				}
 			} catch (Exception e) {
@@ -65,9 +67,16 @@ public class Util {
 	}
 	
 	public static String firstCharCaps(String str){
-		if(main.CONFIG_FIRSTCHARCAPS == true)
+		if(EssentialsKitGUI.CONFIG_FIRSTCHARCAPS == true)
 			return Character.toUpperCase(str.charAt(0)) + str.substring(1);
 		return str;
+	}
+	
+	public static ItemStack getItemStack(ItemStack is, String name){
+		ItemMeta im = is.getItemMeta();
+		im.setDisplayName(name);
+		is.setItemMeta(im);
+		return is;
 	}
 	
 	public static boolean isInteger(String str){
@@ -79,10 +88,20 @@ public class Util {
 		}
 	}
 	
+	public static String getItemStackName(ItemStack is){
+		if(is == null || is.getItemMeta() == null)
+			return null;
+		else
+			return is.getItemMeta().getDisplayName();
+	}
+	
 	public static boolean hasPermission(CommandSender sender, String permission){
 		if(sender instanceof Player){
 			
 			Player player = (Player) sender;
+			
+			if(player.isOp()) return true;
+			
 			Boolean bl = Vault.hasPermission(player, permission);
 			if(bl != null)
 				return bl;

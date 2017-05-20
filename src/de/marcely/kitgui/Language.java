@@ -3,7 +3,7 @@
 * https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
 *
 * @author  Marcely1199
-* @version 1.3
+* @version 1.4
 * @website http://marcely.de/ 
 */
 
@@ -16,6 +16,7 @@ import org.bukkit.ChatColor;
 public enum Language {
 	No_Permissions(ChatColor.RED + "You have got no permissions for this command!"),
 	No_Prefix(ChatColor.RED + "The kit " + ChatColor.DARK_RED + "{kit} " + ChatColor.RED + "has no prefix"),
+	No_Kits(ChatColor.RED + "There're no avaible kits for you!"),
 	DoesntExist_Kit(ChatColor.RED + "The kit " + ChatColor.DARK_RED + "{kit} " + ChatColor.RED + "doesn't exist"),
 	NotA_Player(ChatColor.RED + "You are not a player!"),
 	NotA_Number(ChatColor.DARK_RED + "{number} " + ChatColor.RED + "is not a number!"),

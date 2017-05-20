@@ -3,7 +3,7 @@
 * https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
 *
 * @author  Marcely1199
-* @version 1.3
+* @version 1.4
 * @website http://marcely.de/ 
 */
 
@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import com.earth2me.essentials.User;
 
 public class Kit implements Serializable {
 	private static final long serialVersionUID = 100042053024876811L;
@@ -71,5 +74,21 @@ public class Kit implements Serializable {
 	
 	public boolean removeLore(String lore){
 		return this.lores.remove(lore);
+	}
+	
+	public void give(Player player){
+		final com.earth2me.essentials.Kit kit = Util.getKit(getName());
+		final User user = EssentialsKitGUI.es.getUser(player);
+		
+		// check, if he is allowed to
+		try { kit.checkDelay(user); } catch (Exception e) { return; }
+		
+		player.sendMessage(Language.Giving.getMessage().replace("{kit}", Util.firstCharCaps(kit.getName())));
+		
+		// give items
+		try { kit.expandItems(user); } catch (Exception e) { }
+		
+		// add to the scheduler from essentials
+		try { kit.setTime(user); } catch (Exception e) { e.printStackTrace(); }
 	}
 }
