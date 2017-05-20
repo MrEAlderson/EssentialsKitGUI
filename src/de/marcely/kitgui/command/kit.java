@@ -3,7 +3,7 @@
 * https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
 *
 * @author  Marcely1199
-* @version 1.3
+* @version 1.4
 * @website http://marcely.de/ 
 */
 
@@ -25,12 +25,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.earth2me.essentials.User;
-
 import de.marcely.kitgui.Kit;
 import de.marcely.kitgui.Language;
 import de.marcely.kitgui.Util;
-import de.marcely.kitgui.main;
+import de.marcely.kitgui.EssentialsKitGUI;
 
 public class kit implements CommandExecutor {
 	private static int MAXPERPAGE = 36;
@@ -45,17 +43,15 @@ public class kit implements CommandExecutor {
 		if(sender instanceof Player){
 			Player player = (Player) sender;
 			if(args.length == 0){
-				if(Util.hasPermission(player, "essentials.kit")){
-					player.openInventory(getKitInventory(player));
-				}else{
-					sender.sendMessage(Language.No_Permissions.getMessage());
-				}
+				if(Util.getKits(player).size() >= 1)
+					player.openInventory(getKitInventory(player, 1));
+				else
+					player.sendMessage(Language.No_Kits.getMessage());
 			}else{
-				String kitname = args[0];
-				com.earth2me.essentials.Kit kit = Util.getKit(kitname.toLowerCase());
+				Kit kit = EssentialsKitGUI.kits.getKit(args[0]);
 				if(kit != null){
-					if(Util.hasPermission(sender, "essentials.kits." + kitname.toLowerCase()) || Util.hasPermission(sender, "essentials.kits.*"))
-						giveKit(player, kit);
+					if(Util.hasPermission(sender, "essentials.kits." + kit.getName().toLowerCase()) || Util.hasPermission(sender, "essentials.kits.*"))
+						kit.give(player);
 					else
 						sender.sendMessage(Language.No_Permissions.getMessage());
 				}else{
@@ -69,61 +65,118 @@ public class kit implements CommandExecutor {
 	
 	
 	public static void onInventoryClickEvent(InventoryClickEvent event){
-		Player player = (Player) event.getWhoClicked();
-		Inventory inv = event.getInventory();
-		ItemStack is = event.getCurrentItem();
-		if(inv.getTitle() != null && inv.getTitle() == main.CONFIG_INVTITLE && is != null && is.getType() != null && is.getType() != Material.AIR){
+		final Player player = (Player) event.getWhoClicked();
+		final Inventory inv = event.getClickedInventory();
+		final ItemStack is = event.getCurrentItem();
+		
+		if(inv != null && inv.getTitle() != null && inv.getTitle().startsWith(EssentialsKitGUI.CONFIG_INVTITLE) && is != null && is.getType() != null && is.getType() != Material.AIR){
 			event.setCancelled(true);
-			player.closeInventory();
 			
-			com.earth2me.essentials.Kit kit = Util.getKit(getKitAt(player, event.getSlot(), 1).getName());
+			if(is == null || is.getType() == null || is.getType() == Material.AIR)
+				return;
 			
-			giveKit(player, kit);
+			// get page
+			int page = 1;
+			String p = inv.getTitle().replace(EssentialsKitGUI.CONFIG_INVTITLE + " " + ChatColor.DARK_AQUA, "");
+			if(Util.isInteger(p))
+				page = Integer.valueOf(p);
+			
+			// get kit
+			Kit kit = getKitAt(
+					player, 
+					event.getSlot(), 
+					page);
+			
+			// give
+			if(kit != null){
+				player.closeInventory();
+				kit.give(player);
+			}
+			
+			// change page if --> or <--
+			else{
+				String name = Util.getItemStackName(is);
+				
+				if(name != null){
+					
+					int newPage = page;
+					
+					if(name.equals(ChatColor.GREEN + "-->"))
+						newPage++;
+					else if(name.equals(ChatColor.RED + "<--"))
+						newPage--;
+					
+					// change page
+					if(newPage != page){
+						
+						Inventory newInv = getKitInventory(player, newPage);
+						player.openInventory(newInv);
+					}
+				}
+			}
 		}
 	}
 	
 	public static void onInventoryDragEvent(InventoryDragEvent event){
 		Inventory inv = event.getInventory();
-		if(inv.getTitle() != null && inv.getTitle().startsWith(main.CONFIG_INVTITLE))
+		
+		if(inv.getTitle() != null && inv.getTitle().startsWith(EssentialsKitGUI.CONFIG_INVTITLE))
 			event.setCancelled(true);
 	}
 	
-	public static void giveKit(Player player, com.earth2me.essentials.Kit kit){
-		User user = main.es.getUser(player);
+	public static Inventory getKitInventory(Player player, int page){
+		List<Kit> kits = Util.getKits(player);
+		Inventory inv = null;
+		if(kits.size() > MAXPERPAGE)
+			inv = Bukkit.createInventory(player, getInvSize(kits.size()), EssentialsKitGUI.CONFIG_INVTITLE + " " + ChatColor.DARK_AQUA + page);
+		else
+			inv = Bukkit.createInventory(player, getInvSize(kits.size()), EssentialsKitGUI.CONFIG_INVTITLE);
 		
-		// check, if he is allowed to
-		try { kit.checkDelay(user); } catch (Exception e) { return; }
-		
-		player.sendMessage(Language.Giving.getMessage().replace("{kit}", Util.firstCharCaps(kit.getName())));
-		
-		// give items
-		try { kit.expandItems(user); } catch (Exception e) { }
-		
-		// add to the scheduler from essentials
-		try { kit.setTime(user); } catch (Exception e) { e.printStackTrace(); }
+		for(ItemStack is:getKitsByPage(player, page))
+			inv.addItem(is);
+		if(page < (double) kits.size() / MAXPERPAGE && inv.getSize() > MAXPERPAGE + 17)
+			inv.setItem(MAXPERPAGE + 17, Util.getItemStack(new ItemStack(Material.STAINED_CLAY, 1, (short) 5), ChatColor.GREEN + "-->"));
+		if(page > 1 && inv.getSize() > MAXPERPAGE + 9)
+			inv.setItem(MAXPERPAGE + 9, Util.getItemStack(new ItemStack(Material.STAINED_CLAY, 1, (short) 14), ChatColor.RED + "<--"));
+		if(kits.size() > MAXPERPAGE){
+			for(int i=MAXPERPAGE; i<MAXPERPAGE + 9; i++)
+				inv.setItem(i, Util.getItemStack(new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15), " "));
+		}
+		return inv;
 	}
 	
-	public static Inventory getKitInventory(Player player){
-		ArrayList<Kit> kits = Util.getKits(player);
-		Inventory inv = Bukkit.createInventory(player, getInvSize(kits.size()), main.CONFIG_INVTITLE);
-		for(Kit kit:kits){
-			ItemStack is = kit.getIcon();
+	private static List<ItemStack> getKitsByPage(Player player, int page){
+		List<ItemStack> warps = new ArrayList<ItemStack>();
+		int c = 1;
+		for(ItemStack is:getKits(player)){
+			if(c >= (page - 1) * MAXPERPAGE && c <= page * MAXPERPAGE){
+				warps.add(is);
+			}
+			c++;
+		}
+		return warps;
+	}
+	
+	private static List<ItemStack> getKits(Player player){
+		List<ItemStack> warps = new ArrayList<ItemStack>();
+		
+		for(Kit warp:Util.getKits(player)){
+			ItemStack is = warp.getIcon();
 			ItemMeta im = is.getItemMeta();
 			
 			// name
-			im.setDisplayName(ChatColor.WHITE + Language.stringToChatColor(kit.getPrefix()) + Util.firstCharCaps(kit.getName()));
+			im.setDisplayName(ChatColor.WHITE + Language.stringToChatColor(warp.getPrefix() + Util.firstCharCaps(warp.getName())));
 			
 			// lores
 			List<String> lores = new ArrayList<String>();
-			for(String lore:kit.getLores())
-				lores.add(ChatColor.GRAY + lore);
+			for(String lore:warp.getLores())	
+				lores.add(ChatColor.GRAY + Language.stringToChatColor(lore));
 			im.setLore(lores);
 			
 			is.setItemMeta(im);
-			
-			inv.addItem(is);
+			warps.add(is);
 		}
-		return inv;
+		return warps;
 	}
 	
 	public static int getInvSize(int size){

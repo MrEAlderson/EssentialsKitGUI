@@ -3,7 +3,7 @@
 * https://www.spigotmc.org/resources/essentials-kit-gui-opensource.15160/
 *
 * @author  Marcely1199
-* @version 1.3
+* @version 1.4
 * @website http://marcely.de/ 
 */
 
@@ -18,7 +18,7 @@ import org.bukkit.command.CommandSender;
 import de.marcely.kitgui.Kit;
 import de.marcely.kitgui.Language;
 import de.marcely.kitgui.Util;
-import de.marcely.kitgui.main;
+import de.marcely.kitgui.EssentialsKitGUI;
 import de.marcely.kitgui.config.KitConfig;
 import de.marcely.kitgui.config.Config;
 
@@ -56,7 +56,7 @@ public class kitcfg implements CommandExecutor {
 					
 					if(args.length >= 2){
 						
-						Kit kit = main.kits.getKit(args[1]);
+						Kit kit = EssentialsKitGUI.kits.getKit(args[1]);
 						
 						if(kit != null){
 							String kitname = Util.getKit(args[1].toLowerCase()).getName();
@@ -67,14 +67,14 @@ public class kitcfg implements CommandExecutor {
 							
 							if(args.length >= 4 && args[2].equalsIgnoreCase("set")){
 								
-								main.kits.setPrefix(kitname, args[3]);
-								KitConfig.save(main.kits);
+								EssentialsKitGUI.kits.setPrefix(kitname, args[3]);
+								KitConfig.save(EssentialsKitGUI.kits);
 								sender.sendMessage(Language.Changed_Prefix.getMessage().replace("{kit}", kitname));
 								
 							}else if(args.length >= 3 && args[2].equalsIgnoreCase("remove")){
 								
-								main.kits.setPrefix(kitname, "");
-								KitConfig.save(main.kits);
+								EssentialsKitGUI.kits.setPrefix(kitname, "");
+								KitConfig.save(EssentialsKitGUI.kits);
 								sender.sendMessage(Language.Changed_Prefix.getMessage().replace("{kit}", kitname));
 							
 							}else{
@@ -97,7 +97,7 @@ public class kitcfg implements CommandExecutor {
 
 					if(args.length >= 2){
 						
-						Kit kit = main.kits.getKit(args[1]);
+						Kit kit = EssentialsKitGUI.kits.getKit(args[1]);
 						
 						if(kit != null){
 							
@@ -105,7 +105,7 @@ public class kitcfg implements CommandExecutor {
 							try{
 								kit.getLores();
 							}catch(Exception e){
-								sender.sendMessage(ChatColor.RED + "A error occured: Remove the file at " + ChatColor.DARK_RED + "plugins/" + main.plugin.getName() + "/kits.cfg" + '\n' + ChatColor.RED + "And reload this plugin");
+								sender.sendMessage(ChatColor.RED + "A error occured: Remove the file at " + ChatColor.DARK_RED + "plugins/" + EssentialsKitGUI.plugin.getName() + "/kits.cfg" + '\n' + ChatColor.RED + "And reload this plugin");
 								return true;
 							}
 							
@@ -113,8 +113,15 @@ public class kitcfg implements CommandExecutor {
 							// add lore
 							if(args.length >= 4 && args[2].equalsIgnoreCase("add")){
 								
-								kit.addLore(args[3]);
-								KitConfig.save(main.kits);
+								String lore = "";
+								
+								for(int i=3; i<args.length; i++){
+									lore += args[i];
+									if(i - 1 < args.length) lore += " ";
+								}
+								
+								kit.addLore(lore);
+								KitConfig.save(EssentialsKitGUI.kits);
 								sender.sendMessage(Language.Added_Lore.getMessage().replace("{kit}", kit.getName()));
 								
 							// remove lore
@@ -127,7 +134,7 @@ public class kitcfg implements CommandExecutor {
 									if(id >= 0 && id < kit.getLores().size()){
 										
 										kit.removeLore(kit.getLores().get(id));
-										KitConfig.save(main.kits);
+										KitConfig.save(EssentialsKitGUI.kits);
 										sender.sendMessage(Language.Removed_Lore.getMessage().replace("{id}", args[3]).replace("{kit}", kit.getName()));
 										
 									}else
@@ -179,12 +186,12 @@ public class kitcfg implements CommandExecutor {
 		sender.sendMessage(ChatColor.DARK_AQUA + "/kitcfg reload");
 		sender.sendMessage("");
 		sender.sendMessage(Language.Info_MadeBy.getMessage().replace("{info}", "Marcely1199"));
-		sender.sendMessage(Language.Info_Version.getMessage().replace("{info}", "" + main.getVersion()));
+		sender.sendMessage(Language.Info_Version.getMessage().replace("{info}", "" + EssentialsKitGUI.getVersion()));
 	}
 	
 	public void setIcon(String kitname, Material icon, int id){
-		main.kits.setIcon(kitname, icon, (short) id);
-		de.marcely.kitgui.config.KitConfig.save(main.kits);
+		EssentialsKitGUI.kits.setIcon(kitname, icon, (short) id);
+		de.marcely.kitgui.config.KitConfig.save(EssentialsKitGUI.kits);
 	}
 	
 	public boolean isNumber(String str){
