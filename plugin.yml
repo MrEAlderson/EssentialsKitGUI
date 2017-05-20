@@ -1,8 +1,8 @@
 website: http://marcely.de
-version: 1.3
+version: 1.4
 name: Essentials_KitGUI
 author: Marcely1199
-main: de.marcely.kitgui.main
+main: de.marcely.kitgui.EssentialsKitGUI
 description: A GUI for the command /kit
 softdepend: [Essentials,EssentialsX]
 commands:
