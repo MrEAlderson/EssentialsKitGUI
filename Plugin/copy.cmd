@@ -1,0 +1,3 @@
+@echo off
+echo [INFO] Copying the file over...
+copy /y "out\Plugin.jar" "C:\Programmierung\Debug\Spigot\Bedwars\plugins\KitGUI.jar"

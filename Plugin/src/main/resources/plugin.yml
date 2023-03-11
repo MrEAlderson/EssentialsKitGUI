@@ -1,0 +1,19 @@
+website: "https://seibel.dev"
+version: "${project.version}"
+name: "KitGUI"
+author: "Marcel Seibel (aka Marcely1199)"
+main: "de.marcely.kitgui.KitGUIPlugin"
+description: "Opens a gorgeous GUI for kit selection"
+api-version: 1.13
+softdepend: [ Essentials, EssentialsX ]
+
+commands:
+  kitcfg:
+    description: "Modify the look-and-feel of the kits"
+    usage: "/kitcfg [args...]"
+    aliases: [ kitconfig, kitscfg, kitsconfig ]
+
+permissions:
+  kitcfg.cfg:
+    description: "Grants access to the \"/kitcfg\" command"
+    default: op

@@ -1,0 +1,17 @@
+target/
+bin/
+.idea/
+*.iml
+*.eml
+.settings/
+out/
+copy.cmd
+
+*/target/
+*/bin/
+*/.idea/
+*/*.iml
+*/*.eml
+*/.settings/
+*/out/
+*/copy.cmd
