@@ -38,7 +38,7 @@ public class LoreCommand extends Command.Executor {
                 int num = 1;
 
                 for (String line : kit.getLore()) {
-                    sender.sendMessage("" + ChatColor.GRAY + num + ": " + line);
+                    sender.sendMessage("" + ChatColor.GRAY + ChatColor.BOLD + num + ": " + ChatColorUtil.translate(line));
                     num++;
                 }
 
@@ -66,8 +66,9 @@ public class LoreCommand extends Command.Executor {
                 }
 
                 final List<String> lore = new ArrayList<>(kit.getLore());
+                final String text = "&7" + args[2];
 
-                lore.add("&f" + args[2]);
+                lore.add(text);
 
                 kit.setLore(lore);
                 kit.updateDisplayedIcon();
@@ -75,7 +76,7 @@ public class LoreCommand extends Command.Executor {
 
                 Message.COMMAND_ADD_LORE
                         .placeholder("kit", kit.getName())
-                        .placeholder("lore", ChatColorUtil.translate(args[2]))
+                        .placeholder("lore", ChatColorUtil.translate(text))
                         .send(sender);
             }
             break;
@@ -89,7 +90,7 @@ public class LoreCommand extends Command.Executor {
                 }
 
                 final Integer line = StringUtil.parseInt(args[2]);
-                final String text = "&f" + args[3];
+                final String text = "&7" + args[3];
 
                 if (line == null) {
                     Message.NOT_NUMBER
@@ -116,7 +117,7 @@ public class LoreCommand extends Command.Executor {
                 Message.COMMAND_SET_LORE
                         .placeholder("kit", kit.getName())
                         .placeholder("pos", "" + line)
-                        .placeholder("lore", ChatColorUtil.translate(args[2]))
+                        .placeholder("lore", ChatColorUtil.translate(text))
                         .send(sender);
             }
             break;

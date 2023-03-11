@@ -75,7 +75,7 @@ public class ItemStackUtil {
             final LeatherArmorMeta lam = (LeatherArmorMeta) im;
 
             try {
-                lam.setColor(Color.fromRGB(java.awt.Color.decode(parts[1]).getRGB()));
+                lam.setColor(Color.fromRGB(Integer.decode(parts[1])));
             } catch (Exception e) { }
 
         } else if (!parsedLegacy && StringUtil.parseInt(parts[1]) != null) {
