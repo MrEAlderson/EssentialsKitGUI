@@ -80,11 +80,11 @@ public interface KitProvider <K extends Kit> {
         // top gets prioritized
         testPlugin.accept(
                 "EssentialsX",
-                "net.essentialsx.api.v2",
+                "net.essentialsx.api.v2.services.BalanceTop",
                 plugin -> new EssentialsXKitProvider(guiPlugin, plugin));
         testPlugin.accept(
                 "Essentials",
-                "net.essentialsx.api.v2",
+                "net.essentialsx.api.v2.services.BalanceTop",
                 plugin -> new EssentialsXKitProvider(guiPlugin, plugin));
 
         testPlugin.accept(
