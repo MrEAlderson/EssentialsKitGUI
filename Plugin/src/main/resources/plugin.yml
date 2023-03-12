@@ -1,6 +1,6 @@
 website: "https://seibel.dev"
 version: "${project.version}"
-name: "KitGUI"
+name: "EssentialsKitGUI"
 author: "Marcel Seibel (aka Marcely1199)"
 main: "de.marcely.kitgui.KitGUIPlugin"
 description: "Opens a gorgeous GUI for kit selection"

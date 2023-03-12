@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -29,16 +30,16 @@ public class GUIKitRenderer {
     }
 
     public void open(Player player) {
-        open(player, 1);
+        open(player, 1, new AtomicBoolean(true), true);
     }
 
-    public void open(Player player, int page) {
+    public void open(Player player, int page, AtomicBoolean closeSound, boolean openSound) {
         if (!this.supportsAsync) {
             if (Bukkit.isPrimaryThread())
-                openNow(player, page);
+                openNow(player, page, closeSound, openSound);
             else {
                 Bukkit.getScheduler().runTask(this.container.getPlugin(), () -> {
-                   openNow(player, page);
+                   openNow(player, page, closeSound, openSound);
                 });
             }
 
@@ -47,7 +48,7 @@ public class GUIKitRenderer {
 
         Bukkit.getScheduler().runTaskAsynchronously(this.container.getPlugin(), () -> {
             try {
-                openNow(player, page);
+                openNow(player, page, closeSound, openSound);
             } catch(ConcurrentModificationException e) {
                 this.container.getPlugin().getLogger().log(
                         Level.SEVERE,
@@ -59,9 +60,9 @@ public class GUIKitRenderer {
         });
     }
 
-    private void openNow(Player player, int page) {
+    private void openNow(Player player, int page, AtomicBoolean closeSound, boolean openSound) {
         try {
-            openNowUnchecked(player, page);
+            openNowUnchecked(player, page, closeSound, openSound);
         } catch(Exception e) {
             this.container.getPlugin().getLogger().log(
                     Level.SEVERE,
@@ -70,7 +71,7 @@ public class GUIKitRenderer {
         }
     }
 
-    private void openNowUnchecked(Player player, int page) throws Exception {
+    private void openNowUnchecked(Player player, int page, AtomicBoolean closeSound, boolean openSound) throws Exception {
         // debug
         this.container.getPlugin().getProvider().fetchKits();
 
@@ -114,7 +115,13 @@ public class GUIKitRenderer {
                         .replace("{page}", "" + page);
 
         // render gui
-        final ChestGUI gui = new ChestGUI(guiHeight, guiTitle);
+        final ChestGUI gui = new ChestGUI(guiHeight, guiTitle){
+            @Override
+            public void onClose(Player player) {
+                if (closeSound.get())
+                    GeneralConfig.soundClose.play(player);
+            }
+        };
         final AddItemCondition addCondition = AddItemCondition.within(
                         GeneralConfig.inventoryOffsetLeft,
                         8-GeneralConfig.inventoryOffsetRight,
@@ -175,11 +182,11 @@ public class GUIKitRenderer {
 
             // prev page
             if (page > 1)
-                gui.setItem(getChangePageButton(page, -1), 0, y);
+                gui.setItem(getChangePageButton(page, -1, closeSound), 0, y);
 
             // next page
             if (page < 1 || hasNextPage)
-                gui.setItem(getChangePageButton(page, 1), 8, y);
+                gui.setItem(getChangePageButton(page, 1, closeSound), 8, y);
 
             // deco
             if (GeneralConfig.nextPageBarMaterial != null) {
@@ -220,6 +227,9 @@ public class GUIKitRenderer {
             gui.fillSpace(GeneralConfig.inventoryBackgroundMaterial);
 
         // hooray!
+        if (openSound)
+            GeneralConfig.soundOpen.play(player);
+
         Bukkit.getScheduler().runTask(this.container.getPlugin(), () -> { // must be synced, otherwise there will be an error
             gui.open(player);
         });
@@ -227,6 +237,8 @@ public class GUIKitRenderer {
 
     private GUIItem getGUIItem(GUIKit kit) {
         return new GUIItem(kit.getDisplayedIcon(), (player, leftClick, shiftClick) -> {
+            GeneralConfig.soundClickKit.play(player);
+
             if (kit.hasHook())
                 kit.getHook().give(player);
             else
@@ -234,7 +246,7 @@ public class GUIKitRenderer {
         });
     }
 
-    private GUIItem getChangePageButton(int currentPage, int rel) {
+    private GUIItem getChangePageButton(int currentPage, int rel, AtomicBoolean closeSound) {
         final ItemStack is = GeneralConfig.nextPageButtonMaterial.clone();
         final ItemMeta im = is.getItemMeta();
 
@@ -247,7 +259,10 @@ public class GUIKitRenderer {
         is.setItemMeta(im);
 
         return new GUIItem(is, (player, leftClick, shiftClick) -> {
-            open(player, currentPage+rel);
+            GeneralConfig.soundSwitchPage.play(player);
+
+            closeSound.set(false);
+            open(player, currentPage+rel, new AtomicBoolean(true), false);
         });
     }
 }

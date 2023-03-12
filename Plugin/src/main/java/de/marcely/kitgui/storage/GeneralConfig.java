@@ -1,6 +1,8 @@
 package de.marcely.kitgui.storage;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
+import de.marcely.kitgui.SoundData;
 import de.marcely.kitgui.util.ChatColorUtil;
 import de.marcely.kitgui.util.ItemStackUtil;
 import de.marcely.kitgui.util.YamlConfigurationDescriptor;
@@ -21,7 +23,7 @@ public class GeneralConfig {
     public static String inventoryTitle = "Kits";
     public static String inventoryTitlePage = "Kits - Page {page}";
     public static int inventoryHeight = 6;
-    public static CenterFormat inventoryCenterX = CenterFormat.ALIGNED;
+    public static CenterFormat inventoryCenterX = CenterFormat.CENTRALIZED;
     public static CenterFormat inventoryCenterY = null;
     public static int inventoryOffsetTop = 1;
     public static int inventoryOffsetRight = 1;
@@ -32,6 +34,11 @@ public class GeneralConfig {
 
     public static ItemStack nextPageBarMaterial = ItemStackUtil.setEmptyName(XMaterial.GRAY_STAINED_GLASS_PANE.parseItem());
     public static ItemStack nextPageButtonMaterial = XMaterial.ARROW.parseItem();
+
+    public static SoundData soundOpen = new SoundData(XSound.ENTITY_CHICKEN_EGG, .7f, 1.5f);
+    public static SoundData soundClose = new SoundData(XSound.ENTITY_CHICKEN_EGG, .7f, .5f);
+    public static SoundData soundClickKit = new SoundData(XSound.UI_BUTTON_CLICK, .7f, 1.5f);
+    public static SoundData soundSwitchPage = new SoundData(XSound.ENTITY_HORSE_STEP_WOOD, 1f, 1.2f);
 
     public static Set<String> listenToCommands = new HashSet<>(Arrays.asList("kit", "kits"));
 
@@ -62,6 +69,11 @@ public class GeneralConfig {
         nextPageBarMaterial = ItemStackUtil.setEmptyName(
                 ItemStackUtil.parse(root.getString("next-page-bar-material", "")));
         nextPageButtonMaterial = ItemStackUtil.parse(root.getString("next-page-button-material", ""));
+
+        soundOpen = SoundData.parse(root, "sound.open");
+        soundClose = SoundData.parse(root, "sound.close");
+        soundClickKit = SoundData.parse(root, "sound.click-kit");
+        soundSwitchPage = SoundData.parse(root, "sound.switch-page");
 
         listenToCommands = root.getStringList("listen-to-commands").stream()
                 .map(String::toLowerCase)
@@ -123,6 +135,15 @@ public class GeneralConfig {
         root.addComment("A bar at the bottom will be displayed with a button to switch to the next page in case there are too many items");
         root.set("next-page-bar-material", ItemStackUtil.serialize(nextPageBarMaterial));
         root.set("next-page-button-material", ItemStackUtil.serialize(nextPageButtonMaterial));
+
+        root.addEmptyLine();
+
+        root.addComment("Sound that is being played on various events");
+        root.addComment("Note that custom resource pack sounds only are supported with 1.9+");
+        soundOpen.serialize(root, "sound.open");
+        soundClose.serialize(root, "sound.close");
+        soundClickKit.serialize(root, "sound.click-kit");
+        soundSwitchPage.serialize(root, "sound.switch-page");
 
         root.addEmptyLine();
 
