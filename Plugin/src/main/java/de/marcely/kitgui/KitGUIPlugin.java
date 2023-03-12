@@ -15,6 +15,8 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.logging.Level;
+
 public class KitGUIPlugin extends JavaPlugin {
 
     @Getter
@@ -36,7 +38,20 @@ public class KitGUIPlugin extends JavaPlugin {
             getLogger().warning("Shutting down plugin...");
 
             Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
 
+        try {
+            this.provider.register();
+        } catch(Exception e) {
+            getLogger().log(
+                    Level.SEVERE,
+                    "Failed to register the provider " + this.provider.getName() + " v" + this.provider.getVersion() +
+                            ". Updating it could potentially fix it.",
+                    e);
+            getLogger().warning("Shutting down plugin...");
+
+            Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
@@ -44,7 +59,6 @@ public class KitGUIPlugin extends JavaPlugin {
         GUIContainer.init(this);
         AdaptedGson.init(this);
 
-        this.provider.register();
         Bukkit.getPluginManager().registerEvents(new KitCommandInjector(this.renderer), this);
 
         reloadConfig();

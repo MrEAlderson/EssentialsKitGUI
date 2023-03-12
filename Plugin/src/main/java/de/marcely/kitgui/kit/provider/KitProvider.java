@@ -4,6 +4,7 @@ import de.marcely.kitgui.GUIKit;
 import de.marcely.kitgui.GUIKitContainer;
 import de.marcely.kitgui.KitGUIPlugin;
 import de.marcely.kitgui.kit.Kit;
+import de.marcely.kitgui.util.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public interface KitProvider <K extends Kit> {
@@ -22,7 +22,7 @@ public interface KitProvider <K extends Kit> {
 
     String getVersion();
 
-    void register();
+    void register() throws Exception;
 
     void unregister();
 
@@ -61,7 +61,7 @@ public interface KitProvider <K extends Kit> {
     @Nullable
     static KitProvider<?> findProvider(KitGUIPlugin guiPlugin) {
         final AtomicReference<KitProvider<?>> foundPlugin = new AtomicReference<>();
-        final BiConsumer<String, Function<Plugin, KitProvider<?>>> testPlugin = (name, factory) -> {
+        final TriConsumer<String, String, Function<Plugin, KitProvider<?>>> testPlugin = (name, requiredClass, factory) -> {
             if (foundPlugin.get() != null)
                 return;
 
@@ -70,12 +70,31 @@ public interface KitProvider <K extends Kit> {
             if (plugin == null)
                 return;
 
-            foundPlugin.set(factory.apply(plugin));
+            try {
+                Class.forName(requiredClass);
+
+                foundPlugin.set(factory.apply(plugin));
+            } catch (ClassNotFoundException e) { }
         };
 
-        // top gets prioriztied
-        testPlugin.accept("EssentialsX", plugin -> new EssentialsXKitProvider(guiPlugin, plugin));
-        testPlugin.accept("Essentials", plugin -> new EssentialsXKitProvider(guiPlugin, plugin));
+        // top gets prioritized
+        testPlugin.accept(
+                "EssentialsX",
+                "net.essentialsx.api.v2",
+                plugin -> new EssentialsXKitProvider(guiPlugin, plugin));
+        testPlugin.accept(
+                "Essentials",
+                "net.essentialsx.api.v2",
+                plugin -> new EssentialsXKitProvider(guiPlugin, plugin));
+
+        testPlugin.accept(
+                "EssentialsX",
+                "com.earth2me.essentials.Essentials",
+                plugin -> new EssentialsKitProvider(guiPlugin, plugin));
+        testPlugin.accept(
+                "Essentials",
+                "com.earth2me.essentials.Essentials",
+                plugin -> new EssentialsKitProvider(guiPlugin, plugin));
 
         return foundPlugin.get();
     }

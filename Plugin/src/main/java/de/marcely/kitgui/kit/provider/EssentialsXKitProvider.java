@@ -9,6 +9,7 @@ import net.ess3.api.IEssentials;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -20,10 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EssentialsXKitProvider implements KitProvider<EssentialsXKit> {
 
     @Getter
-    private final KitGUIPlugin plugin;
-    private final IEssentials hook;
+    protected final KitGUIPlugin plugin;
+    protected final IEssentials hook;
 
-    private final Map<String, EssentialsXKit> kits = new ConcurrentHashMap<>();
+    protected final Map<String, EssentialsXKit> kits = new ConcurrentHashMap<>();
 
     @Getter
     private PluginCommand kitCommand;
@@ -45,8 +46,8 @@ public class EssentialsXKitProvider implements KitProvider<EssentialsXKit> {
     }
 
     @Override
-    public void register() {
-        if ((this.kitCommand = this.hook.getPluginCommand("kit")) == null)
+    public void register() throws Exception {
+        if ((this.kitCommand = ((JavaPlugin) this.hook).getCommand("kit")) == null)
             throw new IllegalStateException("EssentialsX didn't register kit command");
 
         this.hook.addReloadListener(this.reloadListener = () -> {
