@@ -3,6 +3,7 @@ package de.marcely.kitgui.util;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -21,9 +22,14 @@ public class ItemStackUtil {
         if (str == null)
             return null;
 
-        final String[] parts = str.split("\\:");
-        XMaterial xMaterial = null;
+        final String[] parts = str
+                .replace("minecraft:", "")
+                .split("\\:");
+        ItemStack is = null;
         boolean parsedLegacy = false;
+
+        if (parts[0].trim().isEmpty())
+            return null;
 
         // fetch is base
         if (StringUtil.parseInt(parts[0]) != null) {
@@ -32,21 +38,37 @@ public class ItemStackUtil {
              if (data == null)
                  data = 0;
 
-            xMaterial = XMaterial.matchXMaterial(
+            final XMaterial xMat = XMaterial.matchXMaterial(
                      StringUtil.parseInt(parts[0]),
                      (byte) (int) data)
                      .orElse(null);
              parsedLegacy = true;
 
-        } else {
-            xMaterial = XMaterial.matchXMaterial(
-                    parts[0].toUpperCase()
-                            .replace("-", "_")
-                            .replace(" ", "_"))
-                    .orElse(null);
-        }
+             if (xMat != null && xMat.isSupported())
+                 is = xMat.parseItem();
 
-        final ItemStack is = xMaterial != null ? xMaterial.parseItem() : null;
+        } else {
+            String name = parts[0].toUpperCase()
+                    .replace("-", "_")
+                    .replace(" ", "_");
+
+            final XMaterial xMat =XMaterial.matchXMaterial(name).orElse(null);
+
+            if (xMat != null && xMat.isSupported())
+                is = xMat.parseItem();
+            else {
+                // deep search
+                name = name.replace("_", "");
+
+                for (Material mat : Material.values()) {
+                    if (!mat.name().replace("_", "").equals(name))
+                        continue;
+
+                    is = new ItemStack(mat);
+                    break;
+                }
+            }
+        }
 
         if (is == null)
             return null;

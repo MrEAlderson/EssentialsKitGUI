@@ -74,7 +74,9 @@ public class SoundData {
 
         if (!this.isActive || this.isCustomResourcePack)
             return null;
-        
+        if (this.name.trim().isEmpty())
+            return null;
+
         final XSound sound = XSound.matchXSound(this.name.toUpperCase()).orElse(null);
 
         if (sound == null || !sound.isSupported())
