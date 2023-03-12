@@ -18,6 +18,10 @@ public interface KitProvider <K extends Kit> {
 
     KitGUIPlugin getPlugin();
 
+    String getName();
+
+    String getVersion();
+
     void register();
 
     void unregister();

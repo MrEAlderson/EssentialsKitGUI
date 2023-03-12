@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,6 +32,16 @@ public class EssentialsXKitProvider implements KitProvider<EssentialsXKit> {
     public EssentialsXKitProvider(KitGUIPlugin guiPlugin, Plugin essentialsPlugin) {
         this.plugin = guiPlugin;
         this.hook = (IEssentials) essentialsPlugin;
+    }
+
+    @Override
+    public String getName() {
+        return "EssentialsX";
+    }
+
+    @Override
+    public String getVersion() {
+        return this.plugin.getDescription().getVersion();
     }
 
     @Override

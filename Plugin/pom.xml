@@ -72,6 +72,12 @@
             <version>2.19.7</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.0.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -90,6 +96,11 @@
                         <relocation>
                             <pattern>com.cryptomorin.xseries</pattern>
                             <shadedPattern>de.marcely.kitgui.libraries.com.cryptomorin.xseries
+                            </shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>de.marcely.kitgui.libraries.org.bstats
                             </shadedPattern>
                         </relocation>
                     </relocations>
