@@ -67,13 +67,13 @@ public class KitConfigCommand implements CommandExecutor, TabExecutor {
                 0,
                 false
         );
-        registerCommand(
+        /*registerCommand(
                 "debug",
                 new DebugCommand(plugin),
                 "",
                 0,
                 false
-        );
+        );*/
     }
 
     @Override
