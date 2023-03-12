@@ -14,7 +14,7 @@ public class KitCommandInjector implements Listener {
         this.renderer = renderer;
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onCommandPreprocessEvent(PlayerCommandPreprocessEvent event) {
         final String[] parts = event.getMessage()
                 .split(" ");
