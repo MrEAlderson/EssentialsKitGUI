@@ -210,7 +210,7 @@ public class GUIKitRenderer {
                 .collect(Collectors.toList());
 
         for (GUIKit kit : setItems) {
-            final int y = kit.getSlotY()%pastGuiSlotsCount;
+            final int y = kit.getSlotY()%(pastGuiSlotsCount/(9-offsetX));
 
             if (y >= gui.getHeight())
                 gui.setHeight(6);

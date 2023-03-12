@@ -7,6 +7,7 @@ import de.marcely.kitgui.command.Command;
 import de.marcely.kitgui.util.ChatColorUtil;
 import org.bukkit.command.CommandSender;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class DisplayNameCommand extends Command.Executor {
         if (args[1].equals("RESET"))
             kit.setDisplayName("&f" + kit.getHook().getName());
         else
-            kit.setDisplayName("&f" + args[1]);
+            kit.setDisplayName("&f" + String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
 
         kit.updateDisplayedIcon();
         kit.save();

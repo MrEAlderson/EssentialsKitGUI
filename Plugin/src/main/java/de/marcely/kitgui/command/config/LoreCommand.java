@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class LoreCommand extends Command.Executor {
                 }
 
                 final List<String> lore = new ArrayList<>(kit.getLore());
-                final String text = "&7" + args[2];
+                final String text = "&7" + String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
                 lore.add(text);
 
@@ -90,7 +91,7 @@ public class LoreCommand extends Command.Executor {
                 }
 
                 final Integer line = StringUtil.parseInt(args[2]);
-                final String text = "&7" + args[3];
+                final String text = "&7" + String.join(" ", Arrays.copyOfRange(args, 3, args.length));
 
                 if (line == null) {
                     Message.NOT_NUMBER
@@ -148,7 +149,7 @@ public class LoreCommand extends Command.Executor {
 
                 final List<String> lore = new ArrayList<>(kit.getLore());
 
-                lore.remove(line-1);
+                final String text = ChatColorUtil.translate(lore.remove(line-1));
 
                 kit.setLore(lore);
                 kit.updateDisplayedIcon();
@@ -157,6 +158,7 @@ public class LoreCommand extends Command.Executor {
                 Message.COMMAND_REMOVE_LORE
                         .placeholder("kit", kit.getName())
                         .placeholder("pos", "" + line)
+                        .placeholder("lore", text)
                         .send(sender);
             }
             break;
