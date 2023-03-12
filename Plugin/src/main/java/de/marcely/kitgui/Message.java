@@ -29,7 +29,7 @@ public enum Message {
     INVALID_MATERIAL("&cInvalid material &4{material}"),
     NOT_NUMBER("&4{number} &cis not a number"),
     PLAYERS_ONLY("Only players may execute the command"),
-    INSUFFICIENT_PERMISSIONS("&cInsufficient permissions\""),
+    INSUFFICIENT_PERMISSIONS("&cInsufficient permissions"),
 
     NEXT_PAGE("&aNext page"),
     PREV_PAGE("&aPrevious page"),
