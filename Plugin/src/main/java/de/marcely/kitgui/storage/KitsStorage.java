@@ -18,6 +18,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class KitsStorage {
 
@@ -27,7 +30,7 @@ public class KitsStorage {
 
             container.clear();
 
-            if (!folder.exists()) {
+            if (!folder.exists() || folder.list().length == 0) {
                 // try to convert from legacy
                 final File legacyFile = KitConfig.getFile();
                 final Logger logger = container.getPlugin().getLogger();
@@ -96,10 +99,9 @@ public class KitsStorage {
 
     public static boolean save(GUIKit kit) {
         try {
-            final File folder = getFolder(kit.getContainer().getPlugin());
-            final File file = new File(folder, kit.getName() + ".json");
+            final File file = getFile(kit);
 
-            folder.mkdirs();
+            file.getParentFile().mkdirs();
 
             if (!kit.exists() || kit.isDefault()) {
                 file.delete();
@@ -120,5 +122,25 @@ public class KitsStorage {
 
     private static File getFolder(Plugin plugin) {
         return new File(plugin.getDataFolder(), "kits");
+    }
+
+    private static File getFile(GUIKit kit) {
+        final File folder = getFolder(kit.getContainer().getPlugin());
+        final Pattern pattern = Pattern.compile("[\\\\/:*?\\\"<>|\"?*.$]");
+        String fileName = kit.getName().replace("@", "$");
+        Matcher match = null;
+
+        while ((match = pattern.matcher(fileName)).find()) {
+            final String invalidChars = fileName.substring(match.start(), match.end());
+            final String replacement = invalidChars.chars()
+                    .mapToObj(i -> "@" + Integer.toHexString(i) + "@")
+                    .collect(Collectors.joining(""));
+
+            fileName = fileName.replace(
+                    invalidChars,
+                    replacement);
+        }
+
+        return new File(folder, fileName + ".json");
     }
 }
