@@ -58,4 +58,4 @@
 * You may look at e.g. [this website](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html) for a list of all available materials. Materials that do not exist with your Minecraft version obviously won't work.
 
 ## Contributions
-We are open for contributions! For that, simply create a pull request for the `master` branch. Any pr for any other branch is being rejected.
+We are open for contributions! For that, simply create a pull request for the `master` branch. Any pull request for any other branch will be rejected.
