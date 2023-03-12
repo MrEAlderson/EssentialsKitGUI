@@ -1,7 +1,5 @@
 package de.marcely.kitgui.storage;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import de.marcely.kitgui.GUIKit;
 import de.marcely.kitgui.GUIKitContainer;
 import de.marcely.kitgui.Kit;
