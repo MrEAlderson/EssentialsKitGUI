@@ -19,6 +19,7 @@
   * Multi-page support. Add as many kits as you want
   * Cute sounds that get played at certain events (can be disabled)
   * GUI looks decent, can be easily and fully customized as well
+  * Hex colors support (1.16+ only, e.g. &#FF00FF)
 * Kit button customizations
   * Change the display name in the GUI
   * Modify the icon
