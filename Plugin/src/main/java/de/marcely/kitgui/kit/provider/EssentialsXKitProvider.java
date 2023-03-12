@@ -42,7 +42,7 @@ public class EssentialsXKitProvider implements KitProvider<EssentialsXKit> {
 
     @Override
     public String getVersion() {
-        return this.plugin.getDescription().getVersion();
+        return this.hook.getDescription().getVersion();
     }
 
     @Override
