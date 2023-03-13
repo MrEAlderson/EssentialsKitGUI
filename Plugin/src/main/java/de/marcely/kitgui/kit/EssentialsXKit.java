@@ -20,7 +20,7 @@ public class EssentialsXKit implements Kit {
 
     @Override
     public boolean hasPermission(Player player) {
-        return player.hasPermission("essentials.kit." + this.name.toLowerCase(Locale.ENGLISH));
+        return player.hasPermission("essentials.kits." + this.name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
