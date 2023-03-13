@@ -6,7 +6,7 @@
 
     <groupId>de.marcely.kitgui</groupId>
     <artifactId>Plugin</artifactId>
-    <version>3.1</version>
+    <version>3.1.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>de.marcely.kitgui</groupId>
             <artifactId>Legacy</artifactId>
-            <version>3.1</version>
+            <version>3.1.1</version>
         </dependency>
 
         <dependency>
