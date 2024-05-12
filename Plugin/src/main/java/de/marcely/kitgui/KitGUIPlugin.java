@@ -7,6 +7,7 @@ import de.marcely.kitgui.storage.GeneralConfig;
 import de.marcely.kitgui.storage.KitsStorage;
 import de.marcely.kitgui.storage.MessagesConfig;
 import de.marcely.kitgui.util.AdaptedGson;
+import de.marcely.kitgui.util.ItemStackStringifier;
 import de.marcely.kitgui.util.gui.GUIContainer;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
@@ -25,6 +26,9 @@ public class KitGUIPlugin extends JavaPlugin {
     private final GUIKitContainer container = new GUIKitContainer(this);
     @Getter
     private final GUIKitRenderer renderer = new GUIKitRenderer(container);
+
+    @Getter
+    private final ItemStackStringifier itemStackStringifier = new ItemStackStringifier(this);
 
     @Override
     public void onEnable() {

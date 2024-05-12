@@ -2,8 +2,10 @@ package de.marcely.kitgui.storage;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
+import de.marcely.kitgui.KitGUIPlugin;
 import de.marcely.kitgui.SoundData;
 import de.marcely.kitgui.util.ChatColorUtil;
+import de.marcely.kitgui.util.ItemStackStringifier;
 import de.marcely.kitgui.util.ItemStackUtil;
 import de.marcely.kitgui.util.YamlConfigurationDescriptor;
 import de.marcely.kitgui.util.gui.CenterFormat;
@@ -42,7 +44,7 @@ public class GeneralConfig {
 
     public static Set<String> listenToCommands = new HashSet<>(Arrays.asList("kit", "kits"));
 
-    public static void loadAndUpdate(Plugin plugin) {
+    public static void loadAndUpdate(KitGUIPlugin plugin) {
         final File file = getFile(plugin);
 
         if (!file.exists()) {
@@ -50,6 +52,7 @@ public class GeneralConfig {
             return;
         }
 
+        final ItemStackStringifier isStringifier = plugin.getItemStackStringifier();
         final YamlConfiguration root = YamlConfiguration.loadConfiguration(file);
 
         inventoryTitle = ChatColorUtil.translate(root.getString("inventory-title", "Kits"));
@@ -62,13 +65,13 @@ public class GeneralConfig {
         inventoryOffsetLeft = root.getInt("inventory-offset-left", 1);
         inventoryOffsetBottom = root.getInt("inventory-offset-bottom", 1);
         inventoryBackgroundMaterial = ItemStackUtil.setEmptyName(
-                ItemStackUtil.parse(root.getString("inventory-background-material", "")));
+                isStringifier.parse(root.getString("inventory-background-material", "")));
         inventoryOffsetMaterial = ItemStackUtil.setEmptyName(
-                ItemStackUtil.parse(root.getString("inventory-offset-material", "")));
+                isStringifier.parse(root.getString("inventory-offset-material", "")));
 
         nextPageBarMaterial = ItemStackUtil.setEmptyName(
-                ItemStackUtil.parse(root.getString("next-page-bar-material", "")));
-        nextPageButtonMaterial = ItemStackUtil.parse(root.getString("next-page-button-material", ""));
+                isStringifier.parse(root.getString("next-page-bar-material", "")));
+        nextPageButtonMaterial = isStringifier.parse(root.getString("next-page-button-material", ""));
 
         soundOpen = SoundData.parse(root, "sound.open");
         soundClose = SoundData.parse(root, "sound.close");
@@ -86,7 +89,8 @@ public class GeneralConfig {
             save(plugin);
     }
 
-    public static void save(Plugin plugin) {
+    public static void save(KitGUIPlugin plugin) {
+        final ItemStackStringifier isStringifier = plugin.getItemStackStringifier();
         final YamlConfigurationDescriptor root = new YamlConfigurationDescriptor();
 
         root.set("version", plugin.getDescription().getVersion());
@@ -127,14 +131,14 @@ public class GeneralConfig {
         root.addEmptyLine();
 
         root.addComment("Fill the empty slots with some material");
-        root.set("inventory-background-material", ItemStackUtil.serialize(inventoryBackgroundMaterial));
-        root.set("inventory-offset-material", ItemStackUtil.serialize(inventoryOffsetMaterial));
+        root.set("inventory-background-material", isStringifier.serialize(inventoryBackgroundMaterial));
+        root.set("inventory-offset-material", isStringifier.serialize(inventoryOffsetMaterial));
 
         root.addEmptyLine();
 
         root.addComment("A bar at the bottom will be displayed with a button to switch to the next page in case there are too many items");
-        root.set("next-page-bar-material", ItemStackUtil.serialize(nextPageBarMaterial));
-        root.set("next-page-button-material", ItemStackUtil.serialize(nextPageButtonMaterial));
+        root.set("next-page-bar-material", isStringifier.serialize(nextPageBarMaterial));
+        root.set("next-page-button-material", isStringifier.serialize(nextPageButtonMaterial));
 
         root.addEmptyLine();
 

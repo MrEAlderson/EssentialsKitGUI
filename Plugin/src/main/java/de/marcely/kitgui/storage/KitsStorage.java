@@ -5,6 +5,7 @@ import de.marcely.kitgui.GUIKitContainer;
 import de.marcely.kitgui.Kit;
 import de.marcely.kitgui.config.KitConfig;
 import de.marcely.kitgui.util.AdaptedGson;
+import de.marcely.kitgui.util.ItemStackStringifier;
 import de.marcely.kitgui.util.ItemStackUtil;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -36,6 +37,7 @@ public class KitsStorage {
                 if (legacyFile.exists()) {
                     logger.info("Detected that you are coming from a legacy version! Auto-upgrading the kits...");
 
+                    final ItemStackStringifier isStringifier = container.getPlugin().getItemStackStringifier();
                     final KitConfig legacy = KitConfig.load(logger);
 
                     if (legacy == null)
@@ -46,7 +48,7 @@ public class KitsStorage {
                     for (Kit lKit : legacy.getKits()) {
                         final GUIKit nKit = new GUIKit(container, lKit.getName());
                         final String baseIconStr = lKit.getIconName() + ":" + lKit.getIconID();
-                        ItemStack baseIcon = ItemStackUtil.parse(baseIconStr);
+                        ItemStack baseIcon = isStringifier.parse(baseIconStr);
 
                         if (baseIcon == null)
                             logger.warning("Failed to parse legacy icon data \"" + baseIconStr + "\" for kit \"" + lKit.getName() + "\". Resetting it");

@@ -4,10 +4,12 @@ import de.marcely.kitgui.GUIKit;
 import de.marcely.kitgui.KitGUIPlugin;
 import de.marcely.kitgui.Message;
 import de.marcely.kitgui.command.Command;
+import de.marcely.kitgui.util.ItemStackStringifier;
 import de.marcely.kitgui.util.ItemStackUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +31,8 @@ public class IconCommand extends Command.Executor {
             return;
         }
 
-        final ItemStack icon = ItemStackUtil.parse(args[1]);
+        final ItemStackStringifier isStringifier = this.plugin.getItemStackStringifier();
+        final ItemStack icon = isStringifier.parse(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
 
         if (icon == null) {
             Message.INVALID_MATERIAL
@@ -44,7 +47,7 @@ public class IconCommand extends Command.Executor {
 
         Message.COMMAND_SET_ICON
                 .placeholder("kit", kit.getName())
-                .placeholder("icon", ItemStackUtil.serialize(kit.getBaseIcon()))
+                .placeholder("icon", isStringifier.serialize(kit.getBaseIcon()))
                 .send(sender);
     }
 
