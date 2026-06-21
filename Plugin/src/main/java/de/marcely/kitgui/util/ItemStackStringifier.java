@@ -16,6 +16,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -119,14 +120,18 @@ public class ItemStackStringifier {
 
         // fetch is base
         if (StringUtil.parseInt(parts[0]) != null) {
-            Integer data = parts.length >= 2 ? StringUtil.parseInt(parts[1]) : 0;
+            final int id = StringUtil.parseInt(parts[0], 0);
+            final byte data = parts.length >= 2 ? StringUtil.parseByte(parts[1], 0) : 0;
 
-            if (data == null)
-                data = 0;
+            // reimplement XMaterial.matchXMaterial(int, byte)
+            // https://github.com/CryptoMorin/XSeries/commit/421a61a85824056dbca2fcf2cbea59c85f84a6a7
+            if (id < 0 || id > 2267 || data < 0)
+                return null;
 
-            final XMaterial xMat = XMaterial.matchXMaterial(
-                            StringUtil.parseInt(parts[0]),
-                            (byte) (int) data)
+            final XMaterial xMat = Arrays.stream(XMaterial.VALUES)
+                    .filter(m -> m.getData() == data)
+                    .filter(m -> m.getId() == id)
+                    .findAny()
                     .orElse(null);
             parsedLegacy = true;
 
